@@ -1,4 +1,4 @@
-name: Manual OWASP Dependency-Check
+name: OWASP Dependency-Check SCA Scan
 
 on:
   push:
@@ -7,30 +7,21 @@ on:
     branches: [ main ]
 
 jobs:
-  scan:
+  dependency-check:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Java
-        uses: actions/setup-java@v3
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          project: "sca-demo-app"
+          format: "ALL"
+          out: "reports"
 
-      - name: Download Dependency-Check
-        run: |
-          curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
-          unzip dependency-check.zip -d dependency-check
-
-      - name: Run Dependency-Check
-        run: |
-          ./dependency-check/dependency-check/bin/dependency-check.sh --project "sca-demo-app" --scan . --format "HTML" --out reports
-
-      - name: Upload Report
-        uses: actions/upload-artifact@v3
+      - name: Upload report
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
           path: reports
